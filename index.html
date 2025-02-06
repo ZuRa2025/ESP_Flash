@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 WebFlasher</title>
+</head>
+<body>
+    <h2>ESP32 WebFlasher</h2>
+    <button id="connectButton">Підключити ESP32</button>
+    <button id="flashButton" disabled>Прошити</button>
+    <p id="status">Очікування...</p>
+
+    <script>
+        let port;
+        const firmwareUrl = "https://yourserver.com/firmware.bin"; // Посилання на прошивку
+
+        document.getElementById("connectButton").addEventListener("click", async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                document.getElementById("status").innerText = "ESP32 підключено!";
+                document.getElementById("flashButton").disabled = false;
+            } catch (err) {
+                console.error(err);
+                alert("Помилка підключення до ESP32");
+            }
+        });
+
+        document.getElementById("flashButton").addEventListener("click", async () => {
+            if (!port) return alert("Спочатку підключіть ESP32!");
+
+            try {
+                document.getElementById("status").innerText = "Завантаження прошивки...";
+                const response = await fetch(firmwareUrl);
+                const firmware = await response.arrayBuffer();
+
+                // Передача прошивки на ESP32 (спрощена схема)
+                const writer = port.writable.getWriter();
+                await writer.write(new Uint8Array(firmware));
+                writer.releaseLock();
+
+                document.getElementById("status").innerText = "Прошивка завершена!";
+            } catch (err) {
+                console.error(err);
+                alert("Помилка прошивки!");
+            }
+        });
+    </script>
+</body>
+</html>
