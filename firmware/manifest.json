@@ -1,12 +1,12 @@
 {
   "name": "ESP32 Firmware",
-  "version": "1.0.0",
+  "version": "2.0",
   "builds": [
     {
       "chipFamily": "ESP32",
       "parts": [
         {
-          "path": "firmware.bin",
+          "path": "ESP_lamp_V.2.ino.merged.bin",
           "offset": 0
         }
       ]
